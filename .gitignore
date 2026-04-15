@@ -1,0 +1,15 @@
+# Binaires
+*.exe
+*.o
+wfc_serial
+wfc_omp
+
+# Résultats (garder le dossier)
+results/*.txt
+results/*.out
+results/*.err
+
+# Éditeurs
+.vscode/
+*.swp
+*~
