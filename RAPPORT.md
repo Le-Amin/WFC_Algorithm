@@ -268,20 +268,43 @@ plusieurs cœurs ajoute de la latence par rapport à un accès local.
 
 | Grille | Temps T=16 | Cellules | Temps/cellule (µs) |
 |---|---|---|---|
-| 32×32 | 0.528 s | 1024 | 516 |
-| 64×64 | 1.307 s | 4096 | 319 |
-| 128×128 | 3.824 s | 16384 | 233 |
-| 256×256 | 21.647 s | 65536 | 330 |
+| 32×32 | 0.528 s | 1 024 | 516 |
+| 64×64 | 1.307 s | 4 096 | 319 |
+| 128×128 | 3.824 s | 16 384 | 233 |
+| 256×256 | 21.647 s | 65 536 | 330 |
+| 512×512 | 75.098 s | 262 144 | 286 |
 
-Le temps par cellule **diminue jusqu'à 128×128** puis remonte à 256×256.
-Cette amélioration partielle au milieu du tableau s'explique par le fait
-que pour des grilles plus grandes, l'entropie (le seul vrai parallel for)
-porte sur plus de cellules et amortit mieux son overhead. Mais à 256×256,
-les effets de cache (l'onde commence à dépasser le L2) reprennent le dessus.
+Le temps par cellule **diminue jusqu'à 128×128** (les phases parallèles –
+notamment l'entropie en `parallel for` sur toutes les cellules – amortissent
+mieux leur overhead sur de grandes plages d'itérations) puis se stabilise
+autour de 280–330 µs/cellule. Cette stabilisation indique que l'on a atteint
+le coût marginal réel de chaque cellule sur cette implémentation : ~300 µs
+par cellule, dominé par l'overhead OpenMP plutôt que par le calcul utile
+(qui prendrait ~1 µs en série).
 
-> *À compléter avec les résultats 512×512 et grilles multi-valeurs.*
+### 4.5 Scalabilité en taille (T=16, échantillon multi-valeurs)
 
-### 4.5 Que faudrait-il pour scaler ?
+Avec l'échantillon `multi_8x8.txt` (3 valeurs distinctes) :
+
+| Grille | Temps T=16 | Cellules | Temps/cellule (µs) |
+|---|---|---|---|
+| 32×32 | 0.820 s | 1 024 | 801 |
+| 64×64 | 3.454 s | 4 096 | 843 |
+| 128×128 | 13.540 s | 16 384 | 826 |
+
+Le coût par cellule est ~**3× plus élevé qu'en binaire** car :
+- L'échantillon `multi_8x8` produit plus de tuiles uniques (donc des wave
+  plus grandes, plus de comparaisons par cellule)
+- La table `compatible[t][oy][ox]` est plus volumineuse → plus de pression
+  cache lors des accès
+- La propagation tend à durer plus longtemps avant convergence (plus de
+  contraintes à satisfaire)
+
+Le coût par cellule reste cependant **constant à travers les tailles**, ce
+qui confirme que le surcoût est lié à la complexité par tuile et non à un
+problème d'échelle propre à OpenMP.
+
+### 4.6 Que faudrait-il pour scaler ?
 
 Plusieurs pistes nécessiteraient une refonte non triviale :
 
