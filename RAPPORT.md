@@ -1,6 +1,6 @@
 # Rapport – Wave Function Collapse parallèle
 
-**Auteur :** Amine Braham
+**Auteurs :** Amine Braham, Antoine Fournaise
 **Cours :** Modèles de programmation parallèle – M1 CHPS
 **Date :** Mai 2026
 
@@ -291,6 +291,7 @@ Avec l'échantillon `multi_8x8.txt` (3 valeurs distinctes) :
 | 32×32 | 0.820 s | 1 024 | 801 |
 | 64×64 | 3.454 s | 4 096 | 843 |
 | 128×128 | 13.540 s | 16 384 | 826 |
+| 256×256 | 45.944 s | 65 536 | 701 |
 
 Le coût par cellule est ~**3× plus élevé qu'en binaire** car :
 - L'échantillon `multi_8x8` produit plus de tuiles uniques (donc des wave
@@ -300,9 +301,12 @@ Le coût par cellule est ~**3× plus élevé qu'en binaire** car :
 - La propagation tend à durer plus longtemps avant convergence (plus de
   contraintes à satisfaire)
 
-Le coût par cellule reste cependant **constant à travers les tailles**, ce
-qui confirme que le surcoût est lié à la complexité par tuile et non à un
-problème d'échelle propre à OpenMP.
+Le coût par cellule reste **stable autour de 700–840 µs** à travers les
+tailles, ce qui confirme que le surcoût est lié à la complexité par tuile
+et non à un problème d'échelle propre à OpenMP. La légère diminution
+observée à 256×256 (701 µs vs 826 µs en 128×128) traduit le même
+phénomène que pour les grilles binaires : sur de plus grandes tailles,
+les phases parallélisables (entropie) amortissent mieux leur overhead.
 
 ### 4.6 Que faudrait-il pour scaler ?
 

@@ -130,7 +130,7 @@ blockquote {
 <div class="title-block">
 <h1>Rapport – Wave Function Collapse parallèle</h1>
 <div class="meta">
-<strong>Auteur :</strong> Amine Braham<br>
+<strong>Auteurs :</strong> Amine Braham, Antoine Fournaise<br>
 <strong>Cours :</strong> Modèles de programmation parallèle – M1 CHPS<br>
 <strong>Date :</strong> Mai 2026
 </div>
@@ -408,6 +408,7 @@ par cellule, dominé par l'overhead OpenMP plutôt que par le calcul utile
 <tr><td>32×32</td><td>0.820 s</td><td>1 024</td><td>801</td></tr>
 <tr><td>64×64</td><td>3.454 s</td><td>4 096</td><td>843</td></tr>
 <tr><td>128×128</td><td>13.540 s</td><td>16 384</td><td>826</td></tr>
+<tr><td>256×256</td><td>45.944 s</td><td>65 536</td><td>701</td></tr>
 </tbody>
 </table>
 
@@ -418,9 +419,12 @@ par cellule, dominé par l'overhead OpenMP plutôt que par le calcul utile
 <li>La propagation tend à durer plus longtemps avant convergence (plus de contraintes à satisfaire)</li>
 </ul>
 
-<p>Le coût par cellule reste cependant <strong>constant à travers les tailles</strong>, ce
-qui confirme que le surcoût est lié à la complexité par tuile et non à un
-problème d'échelle propre à OpenMP.</p>
+<p>Le coût par cellule reste <strong>stable autour de 700–840 µs</strong> à travers les
+tailles, ce qui confirme que le surcoût est lié à la complexité par tuile
+et non à un problème d'échelle propre à OpenMP. La légère diminution
+observée à 256×256 (701 µs vs 826 µs en 128×128) traduit le même
+phénomène que pour les grilles binaires : sur de plus grandes tailles,
+les phases parallélisables (entropie) amortissent mieux leur overhead.</p>
 
 <h3>4.6 Que faudrait-il pour scaler ?</h3>
 <p>Plusieurs pistes nécessiteraient une refonte non triviale :</p>
