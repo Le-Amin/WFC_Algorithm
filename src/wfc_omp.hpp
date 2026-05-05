@@ -77,12 +77,13 @@ bool WFC<N, T>::solve_omp(Grid<T>& output, int rows, int cols,
         struct Job { int dst, rev_ox, rev_oy; };
 
         std::queue<int>   bfs;
-        std::vector<bool> visited(total_cells, false);
+        std::vector<bool> in_queue(total_cells, false);
         bfs.push(chosen_cell);
-        visited[chosen_cell] = true;
+        in_queue[chosen_cell] = true;
 
         while (!bfs.empty()) {
             const int src = bfs.front(); bfs.pop();
+            in_queue[src] = false;   // peut être re-ajouté si modifié à nouveau
             const int cr  = src / cols,  cc = src % cols;
 
             // Construire la liste des voisins valides de src
@@ -138,9 +139,9 @@ bool WFC<N, T>::solve_omp(Grid<T>& output, int rows, int cols,
 
             // Mise à jour de la file BFS (série — après taskwait)
             for (int j = 0; j < njobs; ++j) {
-                if (result[j] == -1)                       return false;
-                if (result[j] ==  1 && !visited[jobs[j].dst]) {
-                    visited[jobs[j].dst] = true;
+                if (result[j] == -1)                          return false;
+                if (result[j] ==  1 && !in_queue[jobs[j].dst]) {
+                    in_queue[jobs[j].dst] = true;
                     bfs.push(jobs[j].dst);
                 }
             }
