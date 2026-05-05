@@ -31,4 +31,4 @@ test_multi: omp
 
 clean:
 	rm -f $(TARGET)_serial $(TARGET)_omp
-	rm -f results/*.txt results/*.out results/*.err
+	rm -f results/*.txt

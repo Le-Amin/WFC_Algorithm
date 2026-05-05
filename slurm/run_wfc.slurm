@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=wfc_omp
-#SBATCH --output=results/wfc_%j.out
-#SBATCH --error=results/wfc_%j.err
+#SBATCH --output=logs/wfc_%j.out
+#SBATCH --error=logs/wfc_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
@@ -13,7 +13,7 @@
 
 set -e
 
-mkdir -p results
+mkdir -p results logs
 
 echo "=== WFC Algorithm - Benchmark OpenMP ==="
 echo "Date        : $(date)"
