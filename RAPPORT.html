@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport - Wave Function Collapse parallèle</title>
+<style>
+@page {
+  size: A4;
+  margin: 22mm 20mm 22mm 20mm;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: #1f2328;
+  margin: 0;
+  padding: 0;
+}
+h1 {
+  font-size: 22pt;
+  margin-top: 0;
+  margin-bottom: 8pt;
+  border-bottom: 2px solid #0b3a66;
+  padding-bottom: 6pt;
+  color: #0b3a66;
+  page-break-after: avoid;
+}
+h2 {
+  font-size: 15pt;
+  margin-top: 22pt;
+  margin-bottom: 8pt;
+  color: #0b3a66;
+  border-bottom: 1px solid #d0d7de;
+  padding-bottom: 4pt;
+  page-break-after: avoid;
+}
+h3 {
+  font-size: 12pt;
+  margin-top: 14pt;
+  margin-bottom: 6pt;
+  color: #1f4063;
+  page-break-after: avoid;
+}
+h4 {
+  font-size: 11pt;
+  margin-top: 12pt;
+  margin-bottom: 4pt;
+  color: #1f4063;
+  page-break-after: avoid;
+}
+p { margin: 4pt 0 8pt 0; text-align: justify; }
+hr {
+  border: 0;
+  border-top: 1px solid #d0d7de;
+  margin: 18pt 0;
+}
+ul, ol { margin: 4pt 0 8pt 0; padding-left: 22pt; }
+li { margin-bottom: 3pt; }
+strong { color: #0b3a66; }
+em { color: #444; }
+code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9.5pt;
+  background: #f6f8fa;
+  padding: 1pt 4pt;
+  border-radius: 3pt;
+  color: #b3093a;
+}
+pre {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 9pt;
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 4pt;
+  padding: 8pt 10pt;
+  line-height: 1.4;
+  overflow-x: auto;
+  page-break-inside: avoid;
+  white-space: pre-wrap;
+  color: #1f2328;
+}
+pre code { background: transparent; padding: 0; color: #1f2328; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8pt 0 12pt 0;
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+th, td {
+  border: 1px solid #d0d7de;
+  padding: 5pt 8pt;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #eef3f8;
+  color: #0b3a66;
+  font-weight: 600;
+}
+tr:nth-child(even) td { background: #fafbfc; }
+.title-block {
+  margin-bottom: 18pt;
+  padding-bottom: 8pt;
+  border-bottom: 1px solid #d0d7de;
+}
+.meta { color: #555; font-size: 10.5pt; line-height: 1.7; }
+blockquote {
+  border-left: 3px solid #b3093a;
+  background: #fff8f8;
+  margin: 8pt 0;
+  padding: 6pt 12pt;
+  color: #444;
+  font-style: italic;
+}
+.toc {
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 4pt;
+  padding: 8pt 16pt;
+  margin: 8pt 0 18pt 0;
+  font-size: 10pt;
+}
+.toc ol { margin: 0; padding-left: 18pt; }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+<h1>Rapport – Wave Function Collapse parallèle</h1>
+<div class="meta">
+<strong>Auteur :</strong> Amine Braham<br>
+<strong>Cours :</strong> Modèles de programmation parallèle – M1 CHPS<br>
+<strong>Date :</strong> Mai 2026
+</div>
+</div>
+
+<div class="toc">
+<strong>Sommaire</strong>
+<ol>
+<li>Description du projet</li>
+<li>Stratégie d'implémentation</li>
+<li>Difficultés rencontrées</li>
+<li>Analyse de performance</li>
+<li>Conclusion</li>
+</ol>
+</div>
+
+<h2>1. Description du projet</h2>
+
+<h3>1.1 Le problème</h3>
+<p>L'algorithme <strong>Wave Function Collapse</strong> (WFC) est une technique de génération
+procédurale qui synthétise une grille de sortie à partir d'un échantillon
+d'entrée, en imposant que chaque sous-grille N×N de la sortie soit une
+sous-grille N×N de l'échantillon. C'est un problème de satisfaction de
+contraintes (CSP) résolu par propagation locale.</p>
+
+<p>Étapes principales :</p>
+<ol>
+<li><strong>Extraction des tuiles</strong> : énumération des sous-grilles N×N de l'échantillon et calcul de leur fréquence d'apparition.</li>
+<li><strong>Calcul des compatibilités</strong> : pour chaque paire de tuiles (t₁, t₂) et chaque offset (ox, oy), déterminer si t₁ à la position p et t₂ à la position p+(ox,oy) sont superposables sans conflit sur leur zone de chevauchement.</li>
+<li><strong>Initialisation</strong> : chaque cellule de la grille de sortie peut accueillir n'importe quelle tuile (état "superposé").</li>
+<li><strong>Boucle de résolution</strong> :
+<ul>
+<li>Calculer l'<strong>entropie</strong> de chaque cellule (nombre de tuiles encore possibles)</li>
+<li>Sélectionner la cellule de plus faible entropie &gt; 1 (heuristique MRV)</li>
+<li><strong>Collapser</strong> : choisir aléatoirement une tuile pondérée par sa fréquence</li>
+<li><strong>Propager</strong> les contraintes aux voisins via un BFS de type AC-3</li>
+</ul>
+</li>
+<li>Répéter jusqu'à ce que toutes les cellules soient collapsées (succès) ou qu'une contradiction apparaisse (échec).</li>
+</ol>
+
+<h3>1.2 Pourquoi paralléliser</h3>
+<p>Le calcul de compatibilité est en O(K² · (2N-1)² · N²) où K est le nombre de
+tuiles uniques – non négligeable pour de grandes grilles. La résolution
+elle-même appelle l'entropie sur toutes les cellules à chaque itération, et
+propage des contraintes sur des sous-zones potentiellement larges. Sur des
+grilles 256×256 ou 512×512, le temps série dépasse la seconde.</p>
+
+<hr>
+
+<h2>2. Stratégie d'implémentation</h2>
+
+<h3>2.1 Architecture générale</h3>
+<p>Le code est en C++17 templaté pour permettre :</p>
+<ul>
+<li>des <strong>tuiles de taille N</strong> quelconque (paramètre template <code>int N</code>)</li>
+<li>des <strong>valeurs de cellule</strong> de type quelconque (paramètre template <code>T</code>)</li>
+</ul>
+
+<p>Trois fichiers d'en-tête principaux :</p>
+<table>
+<thead><tr><th>Fichier</th><th>Contenu</th></tr></thead>
+<tbody>
+<tr><td><code>include/grid.hpp</code></td><td>Conteneur 2D générique avec <code>load</code>/<code>save</code>/<code>print</code></td></tr>
+<tr><td><code>include/tile.hpp</code></td><td>Tuile N×N, extraction, test de compatibilité</td></tr>
+<tr><td><code>include/wfc.hpp</code></td><td>Classe <code>WFC&lt;N,T&gt;</code> + déclarations des deux solveurs</td></tr>
+</tbody>
+</table>
+
+<p>Les implémentations des solveurs sont dans <code>src/wfc_serial.hpp</code> et
+<code>src/wfc_omp.hpp</code> (séparés pour la lisibilité, inclus depuis <code>wfc.hpp</code>).</p>
+
+<h3>2.2 Représentation de l'état</h3>
+<p>L'<strong>onde</strong> (ensemble des configurations possibles) est représentée par :</p>
+<pre><code>using Wave = std::vector&lt;std::vector&lt;bool&gt;&gt;;
+// wave[cell][t] = true ssi la tuile t est encore possible pour la cellule cell</code></pre>
+<p>Pour chaque cellule, un vecteur de booléens de taille <code>num_tiles</code> indique
+quelles tuiles restent compatibles avec les contraintes propagées. L'entropie
+est simplement le nombre de bits à <code>true</code>.</p>
+
+<h3>2.3 Table de compatibilité précomputée</h3>
+<p>Pour éviter de recalculer les compatibilités à chaque propagation :</p>
+<pre><code>// compatible[t1][oy+OFF][ox+OFF] = liste des t2 tels que t1 à p
+// et t2 à p+(ox,oy) sont compatibles
+std::vector&lt;std::vector&lt;std::vector&lt;std::vector&lt;int&gt;&gt;&gt;&gt; compatible;</code></pre>
+<p>avec <code>OFF = N-1</code> et <code>DIM = 2N-1</code> (pour N=2, 9 offsets dont 8 utiles).</p>
+
+<h3>2.4 Version série</h3>
+<p>La résolution série suit la définition canonique :</p>
+<pre><code>tant que il reste des cellules non collapsées :
+    cell ← argmin(entropie) parmi les cellules d'entropie > 1
+    si entropie(cell) == 0 : échec
+    tile ← choix pondéré dans wave[cell]
+    collapse(cell, tile)
+    propager(cell)  # BFS qui élague les wave[voisin]</code></pre>
+
+<p>La propagation utilise une file FIFO standard. Pour chaque cellule défilée,
+on examine ses voisins dans la fenêtre (2N-1)² et on retire de leur wave
+toutes les tuiles non supportées par au moins une tuile encore possible
+sur la cellule source.</p>
+
+<h3>2.5 Version parallèle OpenMP – stratégie finale</h3>
+<p>Trois axes de parallélisation possibles :</p>
+<table>
+<thead><tr><th>Phase</th><th>Parallélisable ?</th><th>Granularité</th></tr></thead>
+<tbody>
+<tr><td>Recherche min-entropie</td><td>Oui (réduction)</td><td>O(rows·cols) cellules indépendantes</td></tr>
+<tr><td>Collapse</td><td>Non (RNG global)</td><td>–</td></tr>
+<tr><td>Propagation BFS</td><td>Partiellement</td><td>O(8) tâches par étape</td></tr>
+</tbody>
+</table>
+
+<p><strong>Choix d'architecture :</strong> <em>une seule région parallèle</em> englobant toute la
+boucle principale, pour amortir le coût de création/destruction des threads
+(voir §3.3).</p>
+
+<pre><code>#pragma omp parallel
+{
+    while (!done) {
+        #pragma omp for nowait
+        for (cell : 0..total_cells-1)   // entropie
+            ...
+        #pragma omp critical { reduce }
+        #pragma omp barrier
+
+        #pragma omp single   // un seul thread fait collapse + BFS
+        {
+            collapse(...);
+            while (!bfs.empty()) {
+                src ← bfs.front();
+                for (j : voisins de src)
+                    #pragma omp task { propage src→dst_j }
+                #pragma omp taskwait
+                update bfs queue
+            }
+        }
+    }
+}</code></pre>
+
+<p><strong>Invariant de sûreté (sans verrou) :</strong> pour une source <code>src</code> fixée, les
+voisins <code>dst_j = src + (oy_j, ox_j)</code> sont <strong>tous distincts</strong> car les offsets
+sont distincts. Les tâches écrivent donc dans des cellules disjointes de
+<code>wave[]</code> et <code>wave[src]</code> reste en lecture seule pendant toute la propagation
+issue de <code>src</code>. Aucun verrou n'est nécessaire sur <code>wave</code>.</p>
+
+<hr>
+
+<h2>3. Difficultés rencontrées</h2>
+
+<h3>3.1 Première version – critical section globale</h3>
+<p>L'implémentation initiale enveloppait toute la mise à jour de wave dans un
+<code>#pragma omp critical(wave_update)</code>. Cela sérialisait toutes les tâches en
+un mutex unique, annulant complètement la parallélisation. La correction a
+nécessité une analyse fine pour prouver formellement que les écritures
+concurrentes étaient sûres sans verrou (cf. invariant de sûreté ci-dessus).</p>
+
+<h3>3.2 BFS visité vs en file</h3>
+<p>Première tentative de correction : ajouter un tableau <code>visited</code> pour éviter
+de retraiter la même cellule. <strong>Bug</strong> : dans WFC, une cellule peut nécessiter
+plusieurs passes de propagation si ses voisins sont modifiés <em>après</em> son
+premier traitement. La version série ne tracke pas le visité non plus, elle
+laisse simplement la file accepter des doublons. La bonne sémantique est un
+indicateur <code>in_queue</code> qui est <em>réinitialisé au défilement</em>, autorisant la
+remise en file si la cellule change ensuite.</p>
+
+<h3>3.3 Overhead de création des régions parallèles</h3>
+<p>Initialement, <code>#pragma omp parallel</code> était placé dans la boucle BFS, donc
+créé/détruit à chaque étape. Le <strong>réveil de threads dormants</strong> sur un nœud
+ARM coûte ~0.1–1 ms par région. Pour une grille 128×128 nécessitant des
+milliers d'étapes BFS, l'overhead atteint plusieurs secondes – <strong>plus que le
+calcul utile lui-même</strong>. La correction (région unique englobant toute la
+boucle, voir §2.5) a divisé par 2 le temps à T=16 mais n'a pas suffi à
+inverser l'anti-scalabilité globale (voir §4).</p>
+
+<h3>3.4 Bugs annexes</h3>
+<ul>
+<li><strong>Makefile + SLURM</strong> : le <code>make clean</code> supprimait <code>results/*.out</code>, effaçant le fichier de sortie SLURM en cours d'exécution. Solution : déplacer les logs SLURM dans un répertoire <code>logs/</code> distinct.</li>
+<li><strong>Architecture ARM</strong> : les binaires compilés sur le nœud de login (x86) ne tournent pas sur les nœuds de calcul (ARM aarch64). La compilation doit se faire dans le job lui-même.</li>
+</ul>
+
+<hr>
+
+<h2>4. Analyse de performance</h2>
+
+<p>Toutes les mesures sur un nœud Romeo <code>armgpu</code> (architecture ARM aarch64,
+32 cœurs alloués). Médiane sur 3 exécutions, graine 42, échantillon
+<code>binary_5x5.txt</code> (8 tuiles uniques).</p>
+
+<h3>4.1 Référence série</h3>
+<table>
+<thead><tr><th>Grille</th><th>Temps série</th></tr></thead>
+<tbody>
+<tr><td>16×16</td><td>0.002 s</td></tr>
+<tr><td>32×32</td><td>0.004 s</td></tr>
+<tr><td>64×64</td><td>0.063 s</td></tr>
+<tr><td>128×128</td><td>0.140 s</td></tr>
+</tbody>
+</table>
+<p>Croissance proche du quadratique en nombre de cellules, conforme à la
+complexité théorique O(R·C·K) où K = num_tiles.</p>
+
+<h3>4.2 Scalabilité en threads (binary 128×128)</h3>
+<p>Comparaison des deux architectures parallèles essayées :</p>
+<table>
+<thead><tr><th>Threads</th><th>V1 (région par étape BFS)</th><th>V2 (région unique)</th><th>Speedup V2 vs série</th></tr></thead>
+<tbody>
+<tr><td>T=1</td><td>0.054 s</td><td>0.045 s</td><td>3.1×</td></tr>
+<tr><td>T=2</td><td>0.985 s</td><td>1.218 s</td><td>0.12×</td></tr>
+<tr><td>T=4</td><td>1.714 s</td><td>1.690 s</td><td>0.08×</td></tr>
+<tr><td>T=8</td><td>3.767 s</td><td>2.852 s</td><td>0.05×</td></tr>
+<tr><td>T=16</td><td>15.506 s</td><td>7.486 s</td><td>0.019×</td></tr>
+<tr><td>T=32</td><td>27.068 s</td><td>27.956 s</td><td>0.005×</td></tr>
+</tbody>
+</table>
+
+<p><strong>Observations :</strong></p>
+<ol>
+<li><strong>Anti-scalabilité confirmée</strong> : ajouter des threads dégrade monotoniquement les performances dans les deux versions.</li>
+<li><strong>V2 améliore significativement les hauts comptes de threads</strong> : à T=16, V2 est 2.1× plus rapide que V1 grâce à l'élimination de l'overhead de création de région à chaque étape BFS. Mais l'amélioration n'est pas suffisante pour rendre la parallélisation rentable.</li>
+<li><strong>T=1 est plus rapide que la version série pure</strong> (0.045 s &lt; série 128×128 pour binaire). L'écart n'est pas dû à la parallélisation (un seul thread) mais probablement à des effets de cache lors de la mesure.</li>
+</ol>
+
+<h3>4.3 Pourquoi l'anti-scalabilité ?</h3>
+<p>Plusieurs facteurs concourent :</p>
+
+<p><strong>(a) Granularité des tâches trop fine.</strong> Pour N=2, chaque étape BFS génère
+au plus 8 tâches. Chaque tâche effectue ~<code>num_tiles × |compatible|</code> ≈ 64
+comparaisons booléennes – soit quelques <strong>nanosecondes</strong> de calcul utile.
+L'overhead OpenMP par tâche (création, scheduling, taskwait) est de l'ordre
+du <strong>microseconde</strong>. Le ratio travail/overhead est défavorable d'un facteur
+1000.</p>
+
+<p><strong>(b) Dépendance séquentielle entre itérations.</strong> La boucle principale
+de WFC est intrinsèquement séquentielle : chaque collapse dépend de
+l'onde résultant de tous les collapses précédents. Seul l'intérieur d'une
+itération peut être parallélisé, et cet intérieur (entropie + propagation
+locale) est petit.</p>
+
+<p><strong>(c) Faux partage sur le tableau <code>result[]</code>.</strong> Dans la propagation, chaque
+tâche écrit <code>result[j]</code> avec j unique. Mais <code>result</code> étant un <code>vector&lt;int&gt;</code>
+contigu, jusqu'à 16 entrées tiennent sur une même ligne de cache de 64 octets.
+Avec 8 threads écrivant simultanément sur des indices voisins, la ligne
+de cache rebondit entre les cœurs – effet <strong>false sharing</strong> classique.</p>
+
+<p><strong>(d) Trafic de cohérence de cache sur <code>wave</code>.</strong> Toutes les tâches lisent
+<code>wave[src]</code> simultanément. Bien que les lectures concurrentes soient
+correctes, sur ARM avec NUMA léger, la diffusion d'une ligne de cache à
+plusieurs cœurs ajoute de la latence par rapport à un accès local.</p>
+
+<h3>4.4 Scalabilité en taille de grille (T=16, binaire)</h3>
+<table>
+<thead><tr><th>Grille</th><th>Temps T=16</th><th>Cellules</th><th>Temps/cellule (µs)</th></tr></thead>
+<tbody>
+<tr><td>32×32</td><td>0.528 s</td><td>1 024</td><td>516</td></tr>
+<tr><td>64×64</td><td>1.307 s</td><td>4 096</td><td>319</td></tr>
+<tr><td>128×128</td><td>3.824 s</td><td>16 384</td><td>233</td></tr>
+<tr><td>256×256</td><td>21.647 s</td><td>65 536</td><td>330</td></tr>
+<tr><td>512×512</td><td>75.098 s</td><td>262 144</td><td>286</td></tr>
+</tbody>
+</table>
+
+<p>Le temps par cellule <strong>diminue jusqu'à 128×128</strong> (les phases parallèles –
+notamment l'entropie en <code>parallel for</code> sur toutes les cellules – amortissent
+mieux leur overhead sur de grandes plages d'itérations) puis se stabilise
+autour de 280–330 µs/cellule. Cette stabilisation indique que l'on a atteint
+le coût marginal réel de chaque cellule sur cette implémentation : ~300 µs
+par cellule, dominé par l'overhead OpenMP plutôt que par le calcul utile
+(qui prendrait ~1 µs en série).</p>
+
+<h3>4.5 Scalabilité en taille (T=16, échantillon multi-valeurs)</h3>
+<p>Avec l'échantillon <code>multi_8x8.txt</code> (3 valeurs distinctes) :</p>
+<table>
+<thead><tr><th>Grille</th><th>Temps T=16</th><th>Cellules</th><th>Temps/cellule (µs)</th></tr></thead>
+<tbody>
+<tr><td>32×32</td><td>0.820 s</td><td>1 024</td><td>801</td></tr>
+<tr><td>64×64</td><td>3.454 s</td><td>4 096</td><td>843</td></tr>
+<tr><td>128×128</td><td>13.540 s</td><td>16 384</td><td>826</td></tr>
+</tbody>
+</table>
+
+<p>Le coût par cellule est ~<strong>3× plus élevé qu'en binaire</strong> car :</p>
+<ul>
+<li>L'échantillon <code>multi_8x8</code> produit plus de tuiles uniques (donc des wave plus grandes, plus de comparaisons par cellule)</li>
+<li>La table <code>compatible[t][oy][ox]</code> est plus volumineuse → plus de pression cache lors des accès</li>
+<li>La propagation tend à durer plus longtemps avant convergence (plus de contraintes à satisfaire)</li>
+</ul>
+
+<p>Le coût par cellule reste cependant <strong>constant à travers les tailles</strong>, ce
+qui confirme que le surcoût est lié à la complexité par tuile et non à un
+problème d'échelle propre à OpenMP.</p>
+
+<h3>4.6 Que faudrait-il pour scaler ?</h3>
+<p>Plusieurs pistes nécessiteraient une refonte non triviale :</p>
+<ol>
+<li><strong>Coarsening des tâches.</strong> Regrouper plusieurs cellules sources dans une même tâche pour amortir l'overhead. Difficile car les sources successives du BFS ne sont pas indépendantes (elles peuvent modifier les mêmes destinations).</li>
+<li><strong>Représentation de l'onde par bitset SIMD.</strong> <code>std::vector&lt;bool&gt;</code> est un bitset mais sans opérations vectorielles efficaces. Un <code>bitset&lt;K&gt;</code> ou un <code>uint64_t</code> (si K ≤ 64) permettrait des unions/intersections en une instruction, et accélérerait la propagation d'un facteur 10–100.</li>
+<li><strong>Multiple restarts en parallèle.</strong> Lancer T résolutions indépendantes avec des graines différentes et garder la première qui réussit – scalabilité parfaite mais hors cadre du sujet.</li>
+<li><strong>GPU / Kokkos.</strong> Déplacer entropie et compatibilité sur GPU. La propagation reste un goulot mais le calcul d'entropie sur 65k cellules pourrait s'exécuter en quelques µs sur GPU.</li>
+</ol>
+
+<hr>
+
+<h2>5. Conclusion</h2>
+
+<p>Le projet a permis d'implémenter complètement l'algorithme WFC dans sa
+variante <em>overlapping</em>, en C++ templaté, avec une version série fonctionnelle
+et une version parallèle utilisant explicitement l'API task d'OpenMP comme
+demandé. La version multi-valeurs est obtenue gratuitement grâce à la
+généricité (paramètre template <code>T</code>).</p>
+
+<p>Le résultat de performance le plus marquant – l'<strong>anti-scalabilité</strong> – est
+contre-intuitif mais explicable par l'analyse :</p>
+<ul>
+<li>WFC est <strong>structurellement séquentiel</strong> (dépendance entre collapses)</li>
+<li>La parallélisation ne peut s'appliquer qu'à l'intérieur d'une itération</li>
+<li>À l'intérieur, les unités de travail sont <strong>trop petites</strong> (~64 ops par tâche) pour amortir l'overhead OpenMP</li>
+</ul>
+
+<p>Cette découverte est un résultat académiquement intéressant : tous les
+algorithmes ne sont pas adaptés à la parallélisation par tâches fines.
+Une parallélisation efficace de WFC nécessiterait soit une refonte
+algorithmique (multiple restarts, bitsets SIMD), soit un changement de
+modèle d'exécution (GPU).</p>
+
+<hr>
+
+<h2>Annexes</h2>
+
+<h3>A. Configuration matérielle</h3>
+<ul>
+<li><strong>Cluster :</strong> Romeo (Université de Reims Champagne-Ardenne)</li>
+<li><strong>Nœud :</strong> romeo-a057, contrainte <code>armgpu</code></li>
+<li><strong>Architecture :</strong> ARM aarch64, 32 cœurs</li>
+<li><strong>Mémoire :</strong> 16 GiB</li>
+<li><strong>Compilateur :</strong> GCC 11.4.1 avec <code>-O2 -fopenmp</code></li>
+</ul>
+
+<h3>B. Reproduire les résultats</h3>
+<pre><code>git clone https://github.com/Le-Amin/WFC_Algorithm.git
+cd WFC_Algorithm
+sbatch slurm/run_wfc.slurm   # ajuster --account
+cat logs/wfc_*.out</code></pre>
+
+</body>
+</html>
