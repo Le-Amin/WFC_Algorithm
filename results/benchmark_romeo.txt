@@ -1,0 +1,45 @@
+=== WFC Algorithm - Benchmark OpenMP ===
+Date        : Tue May  5 21:21:29 CEST 2026
+Noeud       : romeo-a057
+CPUs alloués: 32
+
+--- Compilation ---
+rm -f wfc_serial wfc_omp
+rm -f results/*.txt
+g++ -std=c++17 -O2 -Wall -Wextra -Iinclude -o wfc_serial src/main.cpp
+g++ -std=c++17 -O2 -Wall -Wextra -Iinclude -fopenmp -o wfc_omp src/main.cpp
+Compilation OK
+
+--- Référence série ---
+serial  binary 16x16 : 0.002 s  (x3 médiane)
+serial  binary 32x32 : 0.002 s  (x3 médiane)
+serial  binary 64x64 : 0.005 s  (x3 médiane)
+serial  binary 128x128 : 0.019 s  (x3 médiane)
+serial  binary 256x256 : 0.111 s  (x3 médiane)
+serial  multi  16x16 : 0.002 s  (x3 médiane)
+serial  multi  32x32 : 0.004 s  (x3 médiane)
+serial  multi  64x64 : 0.063 s  (x3 médiane)
+serial  multi  128x128 : 0.140 s  (x3 médiane)
+
+--- Scalabilité threads (binary 128x128) ---
+omp T=1  binary 128x128 : 0.045 s  (x3 médiane)
+omp T=2  binary 128x128 : 1.218 s  (x3 médiane)
+omp T=4  binary 128x128 : 1.690 s  (x3 médiane)
+omp T=8  binary 128x128 : 2.852 s  (x3 médiane)
+omp T=16  binary 128x128 : 7.486 s  (x3 médiane)
+omp T=32  binary 128x128 : 27.956 s  (x3 médiane)
+
+--- Scalabilité taille (16 threads, binaire) ---
+omp T=16 binary 32x32 : 0.528 s  (x3 médiane)
+omp T=16 binary 64x64 : 1.307 s  (x3 médiane)
+omp T=16 binary 128x128 : 3.824 s  (x3 médiane)
+omp T=16 binary 256x256 : 21.647 s  (x3 médiane)
+omp T=16 binary 512x512 : 75.098 s  (x3 médiane)
+
+--- Scalabilité taille (16 threads, multi) ---
+omp T=16 multi  32x32 : 0.820 s  (x3 médiane)
+omp T=16 multi  64x64 : 3.454 s  (x3 médiane)
+omp T=16 multi  128x128 : 13.540 s  (x3 médiane)
+omp T=16 multi  256x256 : 45.944 s  (x3 médiane)
+
+=== Terminé : Tue May  5 21:32:07 CEST 2026 ===
