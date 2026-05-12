@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>WFC - Présentation</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; font-family: "Segoe UI", "Calibri", sans-serif; background: #0a0e1a; color: #e8eef7; }
+
+.slide {
+  display: none;
+  width: 100vw; height: 100vh;
+  padding: 60px 80px;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(135deg, #0f1a2e 0%, #0a0e1a 100%);
+}
+.slide.active { display: flex; }
+
+h1 { font-size: 56px; font-weight: 700; color: #4d8bd8; margin-bottom: 24px; letter-spacing: -0.5px; }
+h1.center { text-align: center; }
+h2 { font-size: 40px; font-weight: 600; color: #6ba3e0; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #1f3a5f; }
+h3 { font-size: 26px; font-weight: 600; color: #8fbce8; margin-top: 22px; margin-bottom: 12px; }
+p, li { font-size: 22px; line-height: 1.55; color: #d6def0; }
+ul { padding-left: 32px; }
+li { margin-bottom: 12px; }
+strong { color: #ffce5c; font-weight: 600; }
+em { color: #a8c8ec; font-style: italic; }
+
+.subtitle { font-size: 28px; color: #a8c8ec; margin-bottom: 50px; }
+.authors { font-size: 24px; color: #d6def0; line-height: 1.8; }
+.meta { font-size: 18px; color: #7a8caa; margin-top: 60px; }
+
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 20px; }
+th, td { padding: 10px 16px; text-align: left; border-bottom: 1px solid #1f3a5f; }
+th { background: #1a2a4a; color: #6ba3e0; font-weight: 600; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+td.num { text-align: right; font-family: "Consolas", monospace; }
+td.bad { color: #f08080; font-weight: 600; }
+td.good { color: #80e080; font-weight: 600; }
+
+code { font-family: "Consolas", "Monaco", monospace; background: #1a2a4a; color: #ffce5c; padding: 2px 8px; border-radius: 4px; font-size: 19px; }
+pre { background: #0a1428; border-left: 3px solid #4d8bd8; padding: 16px 20px; margin: 16px 0; border-radius: 4px; }
+pre code { background: transparent; padding: 0; color: #d6def0; font-size: 18px; line-height: 1.5; }
+
+.speaker {
+  position: absolute; bottom: 20px; left: 80px;
+  font-size: 16px; color: #6ba3e0; font-style: italic;
+}
+.speaker.amine::before { content: "Présenté par : Amine Braham"; }
+.speaker.antoine::before { content: "Présenté par : Antoine Fournaise"; }
+.speaker.both::before { content: "Amine Braham & Antoine Fournaise"; }
+
+.page-num {
+  position: absolute; bottom: 20px; right: 80px;
+  font-size: 16px; color: #6ba3e0;
+}
+
+.center-content { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; }
+
+.two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px; flex: 1; }
+.col-box { background: rgba(77, 139, 216, 0.08); border-left: 3px solid #4d8bd8; padding: 24px 28px; border-radius: 4px; }
+.col-box h3 { margin-top: 0; color: #4d8bd8; }
+
+.callout {
+  background: rgba(255, 206, 92, 0.1);
+  border: 1px solid #ffce5c;
+  border-radius: 6px;
+  padding: 20px 28px;
+  margin: 20px 0;
+  font-size: 22px;
+}
+
+.big-stat { font-size: 72px; color: #ffce5c; font-weight: 700; font-family: "Consolas", monospace; }
+.stats-row { display: flex; justify-content: space-around; align-items: center; margin: 30px 0; }
+.stat-box { text-align: center; }
+.stat-label { font-size: 18px; color: #a8c8ec; margin-top: 8px; }
+
+.nav { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #4d8bd8; opacity: 0.5; }
+
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { width: 1920px; height: auto; overflow: visible; }
+  .slide { display: flex !important; width: 1920px; height: 1080px; page-break-after: always; page-break-inside: avoid; }
+  .nav { display: none; }
+}
+.tag { display: inline-block; background: #1a2a4a; color: #6ba3e0; padding: 4px 12px; border-radius: 12px; font-size: 16px; margin-right: 8px; }
+
+.grid-sample { display: inline-grid; grid-template-columns: repeat(5, 36px); gap: 2px; margin: 12px 0; }
+.cell { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 20px; font-weight: 600; }
+.cell-0 { background: #2c3e60; color: #6ba3e0; }
+.cell-1 { background: #ffce5c; color: #0a0e1a; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide active">
+  <div class="center-content">
+    <h1 class="center">Simple Wave Function Collapse</h1>
+    <div class="subtitle">Parallélisation OpenMP par API task</div>
+    <div class="authors">
+      <strong>Amine Braham</strong> &amp; <strong>Antoine Fournaise</strong>
+    </div>
+    <div class="meta">
+      Modèles de programmation parallèle &mdash; M1 CHPS<br>
+      Mai 2026
+    </div>
+  </div>
+  <span class="page-num">1 / 17</span>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <h2>Plan</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Partie 1 &mdash; Amine</h3>
+      <ul>
+        <li>Le problème WFC</li>
+        <li>Algorithme &mdash; vue d'ensemble</li>
+        <li>Extraction tuiles &amp; compatibilités</li>
+        <li>Entropie, collapse, propagation</li>
+        <li>Implémentation série C++</li>
+      </ul>
+    </div>
+    <div class="col-box">
+      <h3>Partie 2 &mdash; Antoine</h3>
+      <ul>
+        <li>Stratégie de parallélisation</li>
+        <li>Tentative V1 et difficultés</li>
+        <li>Architecture finale V2</li>
+        <li>Analyse de performance</li>
+        <li>Anti-scalabilité &amp; conclusion</li>
+      </ul>
+    </div>
+  </div>
+  <span class="speaker both"></span>
+  <span class="page-num">2 / 17</span>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <h2>Le problème WFC</h2>
+  <p><strong>Wave Function Collapse</strong> : technique de génération procédurale qui synthétise une grille de sortie à partir d'un petit échantillon, en imposant que chaque sous-grille N×N de la sortie existe dans l'échantillon.</p>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Échantillon 5×5</h3>
+      <div class="grid-sample">
+        <div class="cell cell-1">1</div><div class="cell cell-0">0</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div>
+        <div class="cell cell-1">1</div><div class="cell cell-0">0</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div>
+        <div class="cell cell-0">0</div><div class="cell cell-0">0</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div>
+        <div class="cell cell-0">0</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div><div class="cell cell-1">1</div>
+        <div class="cell cell-0">0</div><div class="cell cell-0">0</div><div class="cell cell-0">0</div><div class="cell cell-0">0</div><div class="cell cell-0">0</div>
+      </div>
+      <p style="font-size:18px;color:#a8c8ec;">Petit motif d'entrée</p>
+    </div>
+    <div class="col-box">
+      <h3>Approche</h3>
+      <ul>
+        <li>Problème de satisfaction de contraintes (CSP)</li>
+        <li>Résolu par propagation locale</li>
+        <li>Sortie cohérente <em>localement</em> avec l'échantillon</li>
+        <li>Applications : textures, niveaux de jeu, art procédural</li>
+      </ul>
+    </div>
+  </div>
+  <span class="speaker amine"></span>
+  <span class="page-num">3 / 17</span>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <h2>Algorithme &mdash; vue d'ensemble</h2>
+  <p>Cinq étapes principales, répétées jusqu'à convergence ou échec :</p>
+  <table style="margin-top: 20px;">
+    <thead><tr><th style="width:60px;">#</th><th>Étape</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Extraction</strong></td><td>Énumérer les sous-grilles N×N uniques avec leurs fréquences</td></tr>
+      <tr><td class="num">2</td><td><strong>Compatibilités</strong></td><td>Pour chaque paire (t₁, t₂) et offset, vérifier la superposition</td></tr>
+      <tr><td class="num">3</td><td><strong>Entropie</strong></td><td>Nombre de tuiles encore possibles par cellule (heuristique MRV)</td></tr>
+      <tr><td class="num">4</td><td><strong>Collapse</strong></td><td>Cellule min-entropie &rarr; choix aléatoire pondéré par fréquence</td></tr>
+      <tr><td class="num">5</td><td><strong>Propagation</strong></td><td>BFS de type AC-3 propage les contraintes aux voisins</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">Le cycle 3-4-5 se répète jusqu'à ce que toutes les cellules soient collapsées (succès) ou qu'une contradiction apparaisse (échec).</div>
+  <span class="speaker amine"></span>
+  <span class="page-num">4 / 17</span>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <h2>Étapes 1 et 2 &mdash; Tuiles et compatibilités</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Extraction des tuiles</h3>
+      <p>Pour chaque position (r, c) de l'échantillon, on extrait la sous-grille N×N et on incrémente sa fréquence.</p>
+      <pre><code>for r in 0..H-N:
+  for c in 0..W-N:
+    t = extract(sample, r, c, N)
+    tiles[t].freq += 1</code></pre>
+      <p>Sur l'échantillon 5×5 avec N=2 : <strong>8 tuiles uniques</strong>.</p>
+    </div>
+    <div class="col-box">
+      <h3>Table de compatibilité</h3>
+      <p>Précomputation : pour chaque (t₁, t₂, offset), tester si t₁ et t₂ sont compatibles sur leur zone de chevauchement.</p>
+      <pre><code>compatible[t1][oy+OFF][ox+OFF]
+  = liste des t2 compatibles
+    avec t1 à l'offset (ox, oy)</code></pre>
+      <p>Lookup O(1) pendant la propagation.</p>
+    </div>
+  </div>
+  <span class="speaker amine"></span>
+  <span class="page-num">5 / 17</span>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <h2>Étapes 3 à 5 &mdash; Résolution</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Entropie &amp; Collapse</h3>
+      <ul>
+        <li><strong>Entropie(c)</strong> = nombre de tuiles encore possibles</li>
+        <li>On choisit la cellule de plus faible entropie &gt; 1</li>
+        <li>Tirage aléatoire <em>pondéré par fréquence</em> parmi les tuiles possibles</li>
+        <li>Si entropie = 0 : contradiction &rarr; échec</li>
+      </ul>
+    </div>
+    <div class="col-box">
+      <h3>Propagation BFS</h3>
+      <ul>
+        <li>File FIFO initialisée avec la cellule collapsée</li>
+        <li>Pour chaque cellule défilée : examiner ses voisins dans (2N-1)²</li>
+        <li>Retirer du voisin toutes les tuiles non supportées par la source</li>
+        <li>Si le voisin change &rarr; remettre en file</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">Style <strong>AC-3</strong> (Arc Consistency) : chaque modification déclenche une re-vérification des voisins concernés.</div>
+  <span class="speaker amine"></span>
+  <span class="page-num">6 / 17</span>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <h2>Implémentation série en C++17</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Choix de design</h3>
+      <ul>
+        <li>Code <strong>templaté</strong> : <code>WFC&lt;N, T&gt;</code></li>
+        <li><code>N</code> : taille des tuiles (compile-time)</li>
+        <li><code>T</code> : type des valeurs (binaire, multi-valeurs)</li>
+        <li>Headers séparés pour série / OMP</li>
+      </ul>
+    </div>
+    <div class="col-box">
+      <h3>Représentation de l'onde</h3>
+      <pre><code>using Wave =
+  std::vector&lt;std::vector&lt;bool&gt;&gt;;
+
+// wave[cell][t] = true ssi
+// la tuile t est encore
+// possible pour cette cellule</code></pre>
+      <p>Entropie = nombre de bits à <code>true</code>.</p>
+    </div>
+  </div>
+  <div class="callout"><strong>Bénéfice</strong> de la généricité : la version multi-valeurs est obtenue gratuitement en instanciant <code>WFC&lt;2, int&gt;</code> avec un échantillon à valeurs multiples.</div>
+  <span class="speaker amine"></span>
+  <span class="page-num">7 / 17</span>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <h2>Stratégie de parallélisation</h2>
+  <p>Analyse des phases de l'algorithme pour identifier où paralléliser :</p>
+  <table>
+    <thead><tr><th>Phase</th><th>Parallélisable ?</th><th>Granularité</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recherche min-entropie</strong></td><td class="good">Oui (réduction)</td><td>O(rows·cols) cellules indépendantes</td></tr>
+      <tr><td><strong>Collapse</strong></td><td class="bad">Non</td><td>RNG global, état partagé</td></tr>
+      <tr><td><strong>Propagation BFS</strong></td><td>Partiellement</td><td>O(8) tâches par étape pour N=2</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">L'énoncé demande explicitement l'<strong>API <code>task</code> d'OpenMP</strong> &mdash; choisie pour la propagation où la granularité est variable.</div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">8 / 17</span>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <h2>V1 &mdash; première tentative</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Architecture</h3>
+      <ul>
+        <li><code>#pragma omp parallel</code> créé à chaque étape BFS</li>
+        <li>Tâche par voisin</li>
+        <li><code>#pragma omp critical(wave_update)</code> englobant toute la mise à jour</li>
+        <li>File BFS protégée par <code>omp_lock_t</code></li>
+      </ul>
+    </div>
+    <div class="col-box">
+      <h3>Problèmes constatés</h3>
+      <ul>
+        <li>Le <code>critical</code> sérialise <strong>toutes</strong> les tâches</li>
+        <li>Aucun parallélisme effectif</li>
+        <li>Overhead de création des régions à chaque étape BFS</li>
+        <li>T=32 &rarr; <strong>500× plus lent</strong> que la série</li>
+      </ul>
+    </div>
+  </div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">9 / 17</span>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <h2>Difficultés rencontrées</h2>
+  <h3>1. Critical section globale inutile</h3>
+  <p>La preuve d'absence de race a demandé une analyse fine : pour un <code>src</code> fixé, les <code>dst_j = src + (oy_j, ox_j)</code> sont <strong>tous distincts</strong> car les offsets sont distincts &rarr; pas de verrou nécessaire.</p>
+  <h3>2. BFS : <code>visited</code> vs <code>in_queue</code></h3>
+  <p>Premier fix : ajouter <code>visited[]</code> pour éviter les doublons &rarr; <strong>bug</strong>. Dans WFC une cellule peut nécessiter plusieurs passes si ses voisins changent. La bonne sémantique : <code>in_queue</code> réinitialisé au défilement.</p>
+  <h3>3. Overhead de création des régions parallèles</h3>
+  <p>Sur ARM, réveiller des threads dormants coûte <strong>~0.1 à 1 ms par région</strong>. Avec des milliers d'étapes BFS, cet overhead seul dépasse plusieurs secondes &mdash; plus que le calcul utile.</p>
+  <span class="speaker antoine"></span>
+  <span class="page-num">10 / 17</span>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <h2>V2 &mdash; architecture finale</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Une seule région parallèle</h3>
+      <pre><code>#pragma omp parallel
+{
+  while (!done) {
+    #pragma omp for nowait
+    for (cell : ...) // entropie
+
+    #pragma omp single
+    {
+      collapse(...);
+      while (!bfs.empty()) {
+        for (j : voisins)
+          #pragma omp task
+            { propage src→dst_j }
+        #pragma omp taskwait
+      }
+    }
+  }
+}</code></pre>
+    </div>
+    <div class="col-box">
+      <h3>Invariant de sûreté <em>sans verrou</em></h3>
+      <ul>
+        <li>Pour un <code>src</code> fixé, les <code>dst</code> sont uniques</li>
+        <li>Les tâches écrivent dans des cellules <strong>disjointes</strong></li>
+        <li><code>wave[src]</code> est en lecture seule</li>
+        <li>Résultats dans <code>result[j]</code> (index unique)</li>
+      </ul>
+      <div class="callout"><strong>Aucun verrou</strong> nécessaire sur <code>wave</code>. La file BFS est mise à jour <em>après</em> le <code>taskwait</code>.</div>
+    </div>
+  </div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">11 / 17</span>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <h2>Résultats &mdash; référence série</h2>
+  <p>Mesures sur nœud Romeo <code>armgpu</code> &mdash; ARM aarch64, 32 cœurs. Médiane sur 3 exécutions.</p>
+  <table>
+    <thead><tr><th>Grille</th><th>Temps série (binaire)</th><th>Temps série (multi)</th></tr></thead>
+    <tbody>
+      <tr><td>16×16</td><td class="num">~ 0.001 s</td><td class="num">0.002 s</td></tr>
+      <tr><td>32×32</td><td class="num">~ 0.003 s</td><td class="num">0.004 s</td></tr>
+      <tr><td>64×64</td><td class="num">~ 0.020 s</td><td class="num">0.063 s</td></tr>
+      <tr><td>128×128</td><td class="num">~ 0.050 s</td><td class="num">0.140 s</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">Croissance proche du quadratique en nombre de cellules &mdash; conforme à la complexité théorique O(R·C·K) où K = num_tiles.</div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">12 / 17</span>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <h2>Scalabilité en threads &mdash; binaire 128×128</h2>
+  <table>
+    <thead><tr><th>Threads</th><th>V1 (région par BFS)</th><th>V2 (région unique)</th><th>Speedup V2 vs série</th></tr></thead>
+    <tbody>
+      <tr><td>T=1</td><td class="num">0.054 s</td><td class="num">0.045 s</td><td class="num good">3.1×</td></tr>
+      <tr><td>T=2</td><td class="num">0.985 s</td><td class="num">1.218 s</td><td class="num bad">0.12×</td></tr>
+      <tr><td>T=4</td><td class="num">1.714 s</td><td class="num">1.690 s</td><td class="num bad">0.08×</td></tr>
+      <tr><td>T=8</td><td class="num">3.767 s</td><td class="num">2.852 s</td><td class="num bad">0.05×</td></tr>
+      <tr><td>T=16</td><td class="num">15.506 s</td><td class="num">7.486 s</td><td class="num bad">0.019×</td></tr>
+      <tr><td>T=32</td><td class="num">27.068 s</td><td class="num">27.956 s</td><td class="num bad">0.005×</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>Anti-scalabilité</strong> : plus on ajoute de threads, plus c'est lent. Confirmé sur les deux architectures.</div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">13 / 17</span>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <h2>Pourquoi l'anti-scalabilité ?</h2>
+  <p>Quatre causes identifiées :</p>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>(a) Granularité trop fine</h3>
+      <p>8 tâches par étape BFS, chacune ~64 comparaisons booléennes <strong>(quelques ns)</strong>. Overhead OpenMP par tâche : ~µs. Ratio défavorable d'un facteur <strong>1000×</strong>.</p>
+    </div>
+    <div class="col-box">
+      <h3>(b) Dépendance séquentielle</h3>
+      <p>Chaque collapse dépend de l'onde résultant de tous les précédents &mdash; la boucle principale est <strong>intrinsèquement séquentielle</strong>. Seul l'intérieur d'une itération peut être parallélisé.</p>
+    </div>
+    <div class="col-box">
+      <h3>(c) Faux partage sur <code>result[]</code></h3>
+      <p>Le <code>vector&lt;int&gt;</code> contigu fait tenir 16 éléments par ligne de cache. 8 threads écrivant simultanément &rarr; rebond de ligne de cache, latence multipliée.</p>
+    </div>
+    <div class="col-box">
+      <h3>(d) Cohérence cache sur <code>wave</code></h3>
+      <p>Toutes les tâches lisent <code>wave[src]</code> simultanément. Sur ARM, la diffusion d'une ligne à plusieurs cœurs ajoute de la latence par rapport à un accès local.</p>
+    </div>
+  </div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">14 / 17</span>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <h2>Scalabilité en taille &mdash; T=16</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>Binaire</h3>
+      <table>
+        <thead><tr><th>Grille</th><th>Temps</th><th>µs/cellule</th></tr></thead>
+        <tbody>
+          <tr><td>32×32</td><td class="num">0.528 s</td><td class="num">516</td></tr>
+          <tr><td>64×64</td><td class="num">1.307 s</td><td class="num">319</td></tr>
+          <tr><td>128×128</td><td class="num">3.824 s</td><td class="num">233</td></tr>
+          <tr><td>256×256</td><td class="num">21.65 s</td><td class="num">330</td></tr>
+          <tr><td>512×512</td><td class="num">75.10 s</td><td class="num">286</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-box">
+      <h3>Multi-valeurs</h3>
+      <table>
+        <thead><tr><th>Grille</th><th>Temps</th><th>µs/cellule</th></tr></thead>
+        <tbody>
+          <tr><td>32×32</td><td class="num">0.820 s</td><td class="num">801</td></tr>
+          <tr><td>64×64</td><td class="num">3.454 s</td><td class="num">843</td></tr>
+          <tr><td>128×128</td><td class="num">13.54 s</td><td class="num">826</td></tr>
+          <tr><td>256×256</td><td class="num">45.94 s</td><td class="num">701</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="callout">Coût marginal stable : <strong>~300 µs/cellule (binaire)</strong>, <strong>~800 µs/cellule (multi)</strong>. Plus de tuiles &rarr; plus de pression cache.</div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">15 / 17</span>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <h2>Pistes pour réellement scaler</h2>
+  <div class="two-cols">
+    <div class="col-box">
+      <h3>1. Bitsets SIMD</h3>
+      <p>Remplacer <code>vector&lt;bool&gt;</code> par <code>uint64_t</code> (si K ≤ 64 tuiles) : entropie en 1 instruction <code>popcount</code>, AND/OR vectoriels.</p>
+      <p><strong>Gain attendu : ×10 à ×100</strong></p>
+    </div>
+    <div class="col-box">
+      <h3>2. Multiple restarts</h3>
+      <p>Lancer T résolutions indépendantes avec graines différentes, garder la première qui converge.</p>
+      <p><strong>Scalabilité parfaite</strong> mais hors cadre du sujet.</p>
+    </div>
+    <div class="col-box">
+      <h3>3. Coarsening</h3>
+      <p>Regrouper plusieurs cellules sources dans une même tâche. Difficile car les sources du BFS peuvent partager des destinations.</p>
+    </div>
+    <div class="col-box">
+      <h3>4. GPU / Kokkos</h3>
+      <p>Déplacer entropie et table de compatibilité sur GPU. Calcul d'entropie sur 65k cellules en quelques µs.</p>
+    </div>
+  </div>
+  <span class="speaker antoine"></span>
+  <span class="page-num">16 / 17</span>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <h2>Conclusion</h2>
+  <h3>Ce qui a été livré</h3>
+  <ul>
+    <li>Implémentation WFC <strong>complète et correcte</strong> en C++17 templaté</li>
+    <li>Version série + version parallèle OpenMP utilisant l'<strong>API <code>task</code> explicite</strong></li>
+    <li>Support multi-valeurs <em>gratuit</em> via la généricité</li>
+    <li>Benchmarks sur cluster HPC avec analyse rigoureuse</li>
+  </ul>
+  <h3>Résultat principal</h3>
+  <p>Anti-scalabilité <strong>identifiée, mesurée et expliquée</strong> par quatre mécanismes distincts. WFC à granularité fine est intrinsèquement difficile à paralléliser par tâches.</p>
+  <div class="callout">Comprendre <em>pourquoi</em> un algorithme ne scale pas est un résultat académique aussi valable que le faire scaler &mdash; il oriente le choix du modèle d'exécution adapté.</div>
+  <p style="text-align:center; font-size: 28px; color: #ffce5c; margin-top: 30px;"><strong>Merci de votre attention &mdash; Questions ?</strong></p>
+  <span class="speaker both"></span>
+  <span class="page-num">17 / 17</span>
+</section>
+
+<div class="nav">← → ou Espace pour naviguer | F11 plein écran</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+function show(n) {
+  slides[current].classList.remove('active');
+  current = (n + slides.length) % slides.length;
+  slides[current].classList.add('active');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') show(current + 1);
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(current - 1);
+  else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1);
+});
+document.addEventListener('click', e => {
+  if (e.clientX > window.innerWidth / 2) show(current + 1);
+  else show(current - 1);
+});
+</script>
+
+</body>
+</html>
